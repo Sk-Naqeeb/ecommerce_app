@@ -1,122 +1,339 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() => runApp(const SwiftCartApp());
+
+class Product {
+  final String name;
+  final double price;
+
+  Product(this.name, this.price);
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SwiftCartApp extends StatelessWidget {
+  const SwiftCartApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'SwiftCart',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const LandingPage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class LandingPage extends StatefulWidget {
+  const LandingPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<LandingPage> createState() => _LandingPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _LandingPageState extends State<LandingPage> {
+  final List<Product> cart = [];
+  final List<Product> wishlist = [];
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  final List<String> baseCategories = [
+    'Sneakers',
+    'Smartwatch',
+    'Sunglasses',
+    'Headphones',
+    'Backpack',
+  ];
+
+  final Map<String, List<Product>> baseProducts = {
+    'Sneakers': List.generate(10, (i) => Product('Sneaker ${i + 1}', 49.99 + i)),
+    'Smartwatch': List.generate(5, (i) => Product('Smartwatch ${i + 1}', 99.99 + i * 10)),
+    'Sunglasses': List.generate(4, (i) => Product('Sunglass ${i + 1}', 59.99 + i * 5)),
+    'Headphones': List.generate(6, (i) => Product('Headphone ${i + 1}', 79.99 + i * 8)),
+    'Backpack': List.generate(5, (i) => Product('Backpack ${i + 1}', 39.99 + i * 7)),
+  };
+
+  final Map<String, Map<String, List<Product>>> browseCategories = {
+    'Electronics': {
+      'Smartphones': List.generate(3, (i) => Product('Smartphone ${i + 1}', 699.99 + i * 50)),
+      'TVs': List.generate(3, (i) => Product('TV ${i + 1}', 999.99 + i * 100)),
+      'Laptops': List.generate(3, (i) => Product('Laptop ${i + 1}', 1099.99 + i * 150)),
+    },
+    'Fashion': {
+      'T-Shirts': List.generate(3, (i) => Product('T-Shirt ${i + 1}', 19.99 + i * 5)),
+      'Jeans': List.generate(3, (i) => Product('Jeans ${i + 1}', 49.99 + i * 10)),
+    },
+    'Cosmetics': {
+      'Lipsticks': List.generate(2, (i) => Product('Lipstick ${i + 1}', 14.99 + i * 2)),
+      'Perfumes': List.generate(2, (i) => Product('Perfume ${i + 1}', 29.99 + i * 5)),
+    },
+    'Home Appliances': {
+      'Microwave Ovens': List.generate(2, (i) => Product('Microwave Oven ${i + 1}', 299.99 + i * 50)),
+      'Vacuum Cleaners': List.generate(2, (i) => Product('Vacuum Cleaner ${i + 1}', 199.99 + i * 30)),
+    },
+  };
+
+  void openProductList(String title, List<Product> items) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProductListPage(
+          category: title,
+          products: items,
+          cart: cart,
+          wishlist: wishlist,
+        ),
+      ),
+    );
+  }
+
+  void openSubcategory(String mainCategory, Map<String, List<Product>> subcategories) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SubcategoryPage(
+          category: mainCategory,
+          subcategories: subcategories,
+          cart: cart,
+          wishlist: wishlist,
+        ),
+      ),
+    );
+  }
+
+  void openCart() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CartPage(cart: cart),
+      ),
+    );
+  }
+
+  void openWishlist() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => WishlistPage(wishlist: wishlist),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('SwiftCart', style: TextStyle(fontWeight: FontWeight.bold)),
+        actions: [
+          IconButton(icon: const Icon(Icons.favorite_border), onPressed: openWishlist),
+          IconButton(icon: const Icon(Icons.shopping_cart_outlined), onPressed: openCart),
+        ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text("Shop by Category", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            GridView.count(
+              shrinkWrap: true,
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.2,
+              physics: const NeverScrollableScrollPhysics(),
+              children: baseCategories.map((name) {
+                return GestureDetector(
+                  onTap: () => openProductList(name, baseProducts[name]!),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    padding: const EdgeInsets.all(12),
+                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      const Icon(Icons.shopping_bag_outlined, size: 40, color: Colors.blueAccent),
+                      const SizedBox(height: 10),
+                      Text(name, textAlign: TextAlign.center),
+                    ]),
+                  ),
+                );
+              }).toList(),
             ),
-          ],
+            const SizedBox(height: 32),
+            const Text("Browse by Category", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            Column(
+              children: browseCategories.entries.map((entry) {
+                return ListTile(
+                  title: Text(entry.key),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: () => openSubcategory(entry.key, entry.value),
+                );
+              }).toList(),
+            ),
+          ]),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class SubcategoryPage extends StatelessWidget {
+  final String category;
+  final Map<String, List<Product>> subcategories;
+  final List<Product> cart;
+  final List<Product> wishlist;
+
+  const SubcategoryPage({super.key, required this.category, required this.subcategories, required this.cart, required this.wishlist});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(category)),
+      body: ListView(
+        children: subcategories.entries.map((entry) {
+          return ListTile(
+            title: Text(entry.key),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ProductListPage(
+                    category: entry.key,
+                    products: entry.value,
+                    cart: cart,
+                    wishlist: wishlist,
+                  ),
+                ),
+              );
+            },
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+class ProductListPage extends StatelessWidget {
+  final String category;
+  final List<Product> products;
+  final List<Product> cart;
+  final List<Product> wishlist;
+
+  const ProductListPage({super.key, required this.category, required this.products, required this.cart, required this.wishlist});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(category)),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: products.length,
+        itemBuilder: (_, index) {
+          final product = products[index];
+          return Card(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            child: ListTile(
+              title: Text(product.name),
+              subtitle: Text("\$${product.price.toStringAsFixed(2)}"),
+              trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                IconButton(
+                  icon: const Icon(Icons.favorite_border),
+                  onPressed: () {
+                    if (!wishlist.contains(product)) wishlist.add(product);
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${product.name} added to wishlist')));
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_shopping_cart),
+                  onPressed: () {
+                    cart.add(product);
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${product.name} added to cart')));
+                  },
+                ),
+              ]),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class CartPage extends StatelessWidget {
+  final List<Product> cart;
+
+  const CartPage({super.key, required this.cart});
+
+  @override
+  Widget build(BuildContext context) {
+    double total = cart.fold(0, (sum, p) => sum + p.price);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Cart")),
+      body: cart.isEmpty
+          ? const Center(child: Text("Your cart is empty."))
+          : Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: cart.length,
+              itemBuilder: (_, index) {
+                final product = cart[index];
+                return ListTile(
+                  title: Text(product.name),
+                  subtitle: Text("\$${product.price.toStringAsFixed(2)}"),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      cart.removeAt(index);
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => CartPage(cart: cart)));
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Text("Total: \$${total.toStringAsFixed(2)}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                ElevatedButton(onPressed: () {}, child: const Text("Buy Now")),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class WishlistPage extends StatelessWidget {
+  final List<Product> wishlist;
+
+  const WishlistPage({super.key, required this.wishlist});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Wishlist")),
+      body: wishlist.isEmpty
+          ? const Center(child: Text("Your wishlist is empty."))
+          : ListView.builder(
+        itemCount: wishlist.length,
+        itemBuilder: (_, index) {
+          final product = wishlist[index];
+          return ListTile(
+            title: Text(product.name),
+            subtitle: Text("\$${product.price.toStringAsFixed(2)}"),
+          );
+        },
+      ),
     );
   }
 }
